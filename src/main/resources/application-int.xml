@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:jms="http://www.springframework.org/schema/integration/jms"
+       xmlns:int-twitter="http://www.springframework.org/schema/integration/twitter"
+       xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+       xmlns:amq="http://activemq.apache.org/schema/core"
+
+       xsi:schemaLocation="
+   http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans.xsd
+   http://www.springframework.org/schema/integration
+   http://www.springframework.org/schema/integration/spring-integration.xsd
+   http://www.springframework.org/schema/integration/twitter
+   http://www.springframework.org/schema/integration/twitter/spring-integration-twitter.xsd
+   http://www.springframework.org/schema/integration/stream
+   http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+   http://activemq.apache.org/schema/core
+   http://activemq.apache.org/schema/core/activemq-core.xsd
+   http://www.springframework.org/schema/integration/jms
+   http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd">
+
+  <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="${amq.brokerurl}"/>
+  </bean>
+  
+  <bean id="bericht" class="org.apache.activemq.command.ActiveMQQueue">
+    <constructor-arg value="queue/bericht"/>
+  </bean>
+
+  <int:channel id="BerichtIn" />
+  
+  <bean id="cisJmsListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+    <property name="maxConcurrentConsumers" value="1" />
+    <property name="maxMessagesPerTask" value="1" />
+    <property name="cacheLevelName" value="CACHE_NONE" />
+    <property name="connectionFactory" ref="connectionFactory" />
+    <property name="transactionManager" ref="transactionManager" />
+    <property name="sessionTransacted" value="true" />
+    <property name="transactionTimeout" value="3600" />
+    <property name="receiveTimeout" value="5000" />
+    <property name="destination" ref="bericht" />
+  </bean>
+  
+  <jms:inbound-gateway container="cisJmsListenerContainer"
+                       request-channel="BerichtIn" />
+
+</beans>
