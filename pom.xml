@@ -133,7 +133,7 @@
             <configuration>
               <schemaDirectory>${basedir}/src/main/resources/xsd</schemaDirectory>
               <schemaFiles>
-                melding.xsd
+                creditRequestAvailable.xsd
               </schemaFiles>
               <bindingDirectory>${basedir}/src/main/resources/binding</bindingDirectory>
               <bindingFiles>datetimebinding.xml</bindingFiles>

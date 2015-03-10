@@ -26,7 +26,7 @@
   </bean>
   
   <bean id="bericht" class="org.apache.activemq.command.ActiveMQQueue">
-    <constructor-arg value="queue/bericht"/>
+    <constructor-arg value="queue/creditrequest"/>
   </bean>
 
   <int:channel id="BerichtIn" />

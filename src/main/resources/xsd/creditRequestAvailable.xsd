@@ -1,0 +1,11 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://dozerdemo.marcenschede.nl/melding/v1_0"
+           targetNamespace="http://dozerdemo.marcenschede.nl/melding/v1_0">
+  <xs:element name="creditRequestAvailable">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="id" type="xs:long" minOccurs="1" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
