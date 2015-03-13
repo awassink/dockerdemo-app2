@@ -24,14 +24,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class BerichtOntvanger {
 
     @Autowired
-    private CreditRequestRepository creditRequestRepository;
+    CreditRequestRepositoryWrapper creditRequestRepositoryWrapper;
 
     @ServiceActivator(inputChannel = "BerichtIn")
     public void verwerker(Message<String> msg) throws JAXBException {
 
         CreditRequestAvailable creditRequestAvailable = unmarshalMessage(msg);
 
-        CreditRequest creditRequest = creditRequestRepository.findOne(creditRequestAvailable.getId());
+        CreditRequest creditRequest = creditRequestRepositoryWrapper.findOne(creditRequestAvailable.getId());
 
         markAsInBehandeling(creditRequest);
 
@@ -56,7 +56,7 @@ public class BerichtOntvanger {
             creditRequest.setStatus(Status.AKKOORD);
         }
         creditRequest.setVerwerktdoor(getHostname());
-        creditRequestRepository.save(creditRequest);
+        creditRequestRepositoryWrapper.save(creditRequest);
     }
 
     private CreditRequestAvailable unmarshalMessage(final Message<String> msg) throws JAXBException {
@@ -70,7 +70,7 @@ public class BerichtOntvanger {
 
     private void markAsInBehandeling(final CreditRequest creditRequest) {
         creditRequest.setStatus(Status.IN_BEHANDELING);
-        creditRequestRepository.save(creditRequest);
+        creditRequestRepositoryWrapper.save(creditRequest);
     }
 
     private String getHostname() {
