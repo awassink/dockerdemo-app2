@@ -2,10 +2,6 @@ package app;
 
 import static dozerdemo.utils.MarshallUtils.unmarshalStringToObject;
 
-import java.math.BigDecimal;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import javax.xml.bind.JAXBException;
 
 import nl.marcenschede.dozerdemo.melding.v1_0.CreditRequestAvailable;
@@ -24,39 +20,25 @@ import org.springframework.transaction.annotation.Transactional;
 public class BerichtOntvanger {
 
     @Autowired
-    CreditRequestRepositoryWrapper creditRequestRepositoryWrapper;
+    CreditRequestRepositoryHandler creditRequestRepositoryHandler;
 
     @ServiceActivator(inputChannel = "BerichtIn")
     public void verwerker(Message<String> msg) throws JAXBException {
 
         CreditRequestAvailable creditRequestAvailable = unmarshalMessage(msg);
 
-        CreditRequest creditRequest = creditRequestRepositoryWrapper.findOne(creditRequestAvailable.getId());
-
-        markAsInBehandeling(creditRequest);
-
+        creditRequestRepositoryHandler.markAsInBehandeling(creditRequestAvailable.getId());
         waitSomeMoments();
-        processCreditRequest(creditRequest);
+        creditRequestRepositoryHandler.processCreditRequest(creditRequestAvailable.getId());
     }
 
     private void waitSomeMoments() {
         try {
-            Thread.sleep(5000);
+            Thread.sleep(10000);
         } catch (InterruptedException e) {
             // Put the interrupt back on the Thread and go on
             Thread.currentThread().interrupt();
         }
-    }
-
-    private void processCreditRequest(final CreditRequest creditRequest) {
-        if (creditRequest.getBedrag() != null && creditRequest.getBedrag().compareTo(new BigDecimal(200000)) > 0) {
-            creditRequest.setStatus(Status.AFGEWEZEN);
-            creditRequest.setAfwijsreden("Bedrag is te hoog");
-        } else {
-            creditRequest.setStatus(Status.AKKOORD);
-        }
-        creditRequest.setVerwerktdoor(getHostname());
-        creditRequestRepositoryWrapper.save(creditRequest);
     }
 
     private CreditRequestAvailable unmarshalMessage(final Message<String> msg) throws JAXBException {
@@ -68,16 +50,4 @@ public class BerichtOntvanger {
         return creditRequestAvailable;
     }
 
-    private void markAsInBehandeling(final CreditRequest creditRequest) {
-        creditRequest.setStatus(Status.IN_BEHANDELING);
-        creditRequestRepositoryWrapper.save(creditRequest);
-    }
-
-    private String getHostname() {
-        try {
-            return InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            return "Hostname not retrieved";
-        }
-    }
 }
