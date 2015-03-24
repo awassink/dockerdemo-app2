@@ -34,7 +34,7 @@ public class BerichtOntvanger {
 
     private void waitSomeMoments() {
         try {
-            Thread.sleep(30000);
+            Thread.sleep(35000);
         } catch (InterruptedException e) {
             // Put the interrupt back on the Thread and go on
             Thread.currentThread().interrupt();
